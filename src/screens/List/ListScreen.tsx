@@ -47,6 +47,7 @@ const ListUIScreen: React.FC = () => {
 
   const searchbyInputField = (inputValue: string) => {
     setSearchText(inputValue);
+    setOnFocusInput(false)
     inputValue = inputValue.toLowerCase();
     if (inputValue === '') {
       setListData(mainArray);

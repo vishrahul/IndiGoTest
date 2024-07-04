@@ -11,7 +11,7 @@ import {
 import styles from './Styles';
 import getListData from '../../services/APICall';
 import {Dropdown} from 'react-native-element-dropdown';
-import {deviceWidth, dropDownData} from '../../utils/Constant';
+import {deviceHeight, deviceWidth, dropDownData} from '../../utils/Constant';
 import {ListDataType} from './DataType';
 import CommonTextInput from '../commonComponent/CommonTextInput';
 
@@ -146,16 +146,18 @@ const ListUIScreen: React.FC = () => {
       ) : (
         <View>
           {listData?.length > 0 ? (
-            <FlatList
-              data={listData}
-              renderItem={renderListData}
-              numColumns={noOfColumn}
-              key={noOfColumn}
-              keyExtractor={item => item?.id.toString()}
-              onEndReached={loadMore}
-              onEndReachedThreshold={0.5}
-              onScroll={() => setOnFocusInput(true)}
-            />
+            <View style={{height: '90%'}}>
+              <FlatList
+                data={listData}
+                renderItem={renderListData}
+                numColumns={noOfColumn}
+                key={noOfColumn}
+                keyExtractor={item => item?.id.toString()}
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
+                onScroll={() => setOnFocusInput(true)}
+              />
+            </View>
           ) : (
             <Text style={styles.noDataFoundStyle}>
               No Data Found, Try different one

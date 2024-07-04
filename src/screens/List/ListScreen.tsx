@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Image, SafeAreaView, Text, View} from 'react-native';
+import {
+  Button,
+  FlatList,
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import styles from './Styles';
 import getListData from '../../services/APICall';
 import {Dropdown} from 'react-native-element-dropdown';
@@ -15,13 +23,16 @@ const ListUIScreen: React.FC = () => {
   const [pageNo, setPageNo] = useState<number>(1);
   const [onFocusInput, setOnFocusInput] = useState<boolean>(false);
 
+  const [showFullImage, setShowFullImage] = useState<boolean>(false);
+  const [showSelectedImage, setSelectedImage] = useState<string>('');
+  const [currentIndex, setCurrentIndex] = useState<number>();
+
   // Get the List Of Data Via API Call
   const getData = async () => {
     const apiData = await getListData(pageNo);
     setListData(apiData);
     setMainArray(apiData);
   };
-
 
   useEffect(() => {
     async function asyncCall() {
@@ -30,24 +41,30 @@ const ListUIScreen: React.FC = () => {
     asyncCall();
   }, [pageNo]);
 
+  const showImage = (item, index) => {
+    setCurrentIndex(index);
+    setShowFullImage(true);
+    setSelectedImage(item?.image);
+  };
 
-  const renderListData = ({item}: {item: ListDataType}) => {
+  const renderListData = ({item, index}: {item: ListDataType}) => {
     return (
-      <View>
+      <TouchableOpacity onPress={() => showImage(item, index)}>
         {/* <Text numberOfLines={1} style={{width: deviceWidth / noOfColumn}}>
           {item?.title}
         </Text> */}
         <Image
           source={{uri: item?.image}}
           style={[styles.imgaeStyle, {width: deviceWidth / noOfColumn - 25}]}
+          resizeMode="contain"
         />
-      </View>
+      </TouchableOpacity>
     );
   };
 
   const searchbyInputField = (inputValue: string) => {
     setSearchText(inputValue);
-    setOnFocusInput(false)
+    setOnFocusInput(false);
     inputValue = inputValue.toLowerCase();
     if (inputValue === '') {
       setListData(mainArray);
@@ -64,6 +81,19 @@ const ListUIScreen: React.FC = () => {
       const nextPage = pageNo + 1;
       setPageNo(nextPage);
     }
+  };
+
+  const backToList = () => {
+    setShowFullImage(false);
+  };
+
+  const forwardToNextImage = () => {
+    setSelectedImage(listData[currentIndex + 1]?.image);
+    setCurrentIndex(currentIndex + 1);
+  };
+  const backToPrevImage = () => {
+    setSelectedImage(listData[currentIndex - 1]?.image);
+    setCurrentIndex(currentIndex - 1);
   };
 
   return (
@@ -100,22 +130,38 @@ const ListUIScreen: React.FC = () => {
           }}
         />
       </View>
-
-      {listData?.length > 0 ? (
-        <FlatList
-          data={listData}
-          renderItem={renderListData}
-          numColumns={noOfColumn}
-          key={noOfColumn}
-          keyExtractor={item => item?.id.toString()}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          onScroll={() => setOnFocusInput(true)}
-        />
+      {showFullImage ? (
+        <View style={styles.fullViewStyle}>
+          <Image
+            source={{uri: showSelectedImage}}
+            style={styles.selectedImageStyle}
+            resizeMode="contain"
+          />
+          <View style={styles.buttonViewStyle}>
+            <Button title="Back" onPress={backToPrevImage} />
+            <Button title="Back to List" onPress={backToList} />
+            <Button title="Next" onPress={forwardToNextImage} />
+          </View>
+        </View>
       ) : (
-        <Text style={styles.noDataFoundStyle}>
-          No Data Found, Try different one
-        </Text>
+        <View>
+          {listData?.length > 0 ? (
+            <FlatList
+              data={listData}
+              renderItem={renderListData}
+              numColumns={noOfColumn}
+              key={noOfColumn}
+              keyExtractor={item => item?.id.toString()}
+              onEndReached={loadMore}
+              onEndReachedThreshold={0.5}
+              onScroll={() => setOnFocusInput(true)}
+            />
+          ) : (
+            <Text style={styles.noDataFoundStyle}>
+              No Data Found, Try different one
+            </Text>
+          )}
+        </View>
       )}
     </SafeAreaView>
   );

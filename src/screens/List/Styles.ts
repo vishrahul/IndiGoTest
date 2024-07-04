@@ -1,4 +1,5 @@
 import {Platform, StyleSheet} from 'react-native';
+import {deviceHeight, deviceWidth} from '../../utils/Constant';
 
 export const styles = StyleSheet.create({
   mainView: {
@@ -87,6 +88,12 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  selectedImageStyle: {width: deviceWidth, height: deviceHeight - 350},
+  fullViewStyle: {
+    alignSelf: 'center',
+  },
+
+  buttonViewStyle: {flexDirection: 'row', justifyContent: 'space-around'},
 });
 
 export default styles;
